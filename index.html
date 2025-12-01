@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Christina | Full Stack Developer</title>
+    <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* --- VARIABLES --- */
+        :root {
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --primary: #38bdf8;
+            --secondary: #818cf8;
+            --accent: #f472b6;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            cursor: none;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
+
+        html { scroll-behavior: smooth; }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- INTRO ANIMATION --- */
+        /* --- RESTORED ANIMATIONS --- */
+        @keyframes introPop {
+            0% { opacity: 0; transform: translateY(30px) scale(0.9); }
+            80% { transform: translateY(-5px) scale(1.02); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* Force animation on load */
+        .hero-left > * {
+            animation: introPop 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0; /* Start invisible so it pops in */
+        }
+        .hero-right {
+            animation: introPop 1s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+            opacity: 0;
+            animation-delay: 0.2s; /* Image pops slightly after text */
+        }
+
+        /* Stagger the text elements */
+        .hero-left p:nth-child(1) { animation-delay: 0.4s; }
+        .hero-left h1 { animation-delay: 0.6s; }
+        .typewriter { animation-delay: 0.7s; }
+        .hero-text { animation-delay: 0.8s; }
+        .hero-left .btn { animation-delay: 0.9s; }
+        .social-icons { animation-delay: 1s; }
+        .hero-right { animation-delay: 0.7s; } /* Avatar pops in early */
+
+        #intro-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            z-index: 9999; display: flex; pointer-events: none;
+        }
+        .intro-col {
+            width: 20%; height: 100%; background:#a020f0;
+            transform: translateY(0);
+            transition: transform 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+        /* Delays for the venetian blind effect */
+        .intro-col:nth-child(2) { transition-delay: 100ms; }
+        .intro-col:nth-child(3) { transition-delay: 200ms; }
+        .intro-col:nth-child(4) { transition-delay: 300ms; }
+        .intro-col:nth-child(5) { transition-delay: 400ms; }
+        
+        #intro-text-container {
+            position: absolute; 
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 10; /* Ensures it sits ON TOP of columns */
+        }
+        
+        #intro-text {
+            font-weight: 800; font-size: 4rem; color: white;
+            transition: opacity 0.3s;
+        }
+        /* --- 1. BLOBS --- */
+        .blob {
+            position: fixed; width: 500px; height: 500px;
+            background: var(--primary); border-radius: 50%;
+            filter: blur(100px); opacity: 0.15; z-index: -1;
+            animation: float 10s infinite alternate;
+        }
+        .blob:nth-child(2) { background: var(--accent); right: 0; bottom: 0; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0); } 100% { transform: translate(30px, 50px); } }
+
+        /* --- 2. CURSOR --- */
+        .cursor-dot {
+            position: fixed; top: 0; left: 0;
+            width: 20px; height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            pointer-events: none; z-index: 9999;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: exclusion;
+            box-shadow: 0 0 4px rgba(56, 189, 248, 0.2); 
+        }
+
+        .cursor-outline {
+            position: fixed; top: 0; left: 0;
+            width: 35px; height: 35px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            pointer-events: none; z-index: 9998;
+            transform: translate(-50%, -50%);
+            transition: all 0.1s ease-out;
+        }
+        body.hovering .cursor-outline { width: 50px; height: 50px; border-color: var(--primary); opacity: 0.5; }
+        body.hovering .cursor-dot { transform: translate(-50%, -50%) scale(1.5); background: white; }
+
+        /* --- UTILS --- */
+        .container { max-width: 1000px; margin: 0 auto; padding: 0 2rem; }
+        
+        /* Section Spacing (Preserved) */
+        section { padding-bottom: 50px; } 
+        #home { padding-top: 100px; padding-bottom: 100px; }
+        #about { padding-top: 50px; }
+        #about h2 { margin-bottom: 2rem; }
+        #skills { padding-top: 50px; }
+        #skills h2 { margin-bottom: 2rem; }
+        #work { padding-top: 50px; }
+        #contact { padding-top: 50px; padding-bottom: 50px; }
+        
+        h2 {
+            font-size: 3rem; 
+            text-align: center;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+
+        /* --- NAV --- */
+        nav {
+            position: fixed; top: 0; width: 100%; padding: 1.5rem 0;
+            background: rgba(15, 23, 42, 0.95); 
+            backdrop-filter: blur(15px);
+            z-index: 100; border-bottom: 1px solid var(--border);
+        }
+        .nav-content { display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-size: 1.5rem; font-weight: 700; color: white; text-decoration: none; z-index: 1001;}
+        .nav-links { display: flex; gap: 2rem; }
+        .nav-links a { color: var(--text-muted); text-decoration: none; transition: 0.3s; }
+        .nav-links a:hover { color: var(--primary); }
+        .hamburger { display: none; cursor: pointer; font-size: 1.5rem; color: white; z-index: 1001; }
+
+        /* --- HERO --- */
+        .hero { min-height: 100vh; display: flex; align-items: center; }
+        .hero-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 4rem; align-items: center; }
+        .hero-left h1 { font-size: 4.5rem; line-height: 1.1; margin-bottom: 1rem; font-weight: 800; }
+        .hero-left span { color: var(--primary); }
+        .typewriter { font-family: 'Courier New', monospace; font-size: 1.3rem; color: var(--secondary); margin-bottom: 2rem; height: 1.5em; }
+        .hero-text { color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.1rem; line-height: 1.6; max-width: 90%; }
+        .btn {
+            padding: 1rem 2.5rem; border-radius: 50px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white; text-decoration: none; font-weight: 700; display: inline-block;
+            box-shadow: 0 4px 15px rgba(56, 189, 248, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s; border: none;
+        }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5); }
+
+        /* --- AVATAR POP-OUT --- */
+        .avatar-container {
+            position: relative; width: 400px; height: 500px; margin: 0 auto; margin-top: -180px;
+            display: flex; align-items: flex-start; justify-content: center;
+        }
+        .avatar-box {
+            position: absolute; bottom: 0; width: 100%; height: 85%;
+            background: transparent; border-radius: 20px;
+            border: none;
+            z-index: 1;
+        }
+        .avatar-img {
+            position: relative; z-index: 2; width: 110%; margin-bottom: 0px;
+            /*The 3D Pop Effect: Dark depth shadow + Purple rim light*/
+            filter: drop-shadow(0 20px 30px rgba(0,0,0,0.8)) drop-shadow(0 0 20px rgba(139, 92, 246, 0.5));
+            animation: float 100s ease-in-out infinite;
+        }
+        /*
+        .avatar-box {
+            background: var(--bg-card); border-radius: 20px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 0 15px var(--primary), 0 0 50px rgba(56, 189, 248, 0.4); z-index: 1;
+        }
+        */
+
+        .social-icons { margin-top: 2.5rem; display: flex; gap: 1.5rem; margin-bottom: 6rem; }
+        .social-icons a { color: var(--text-muted); font-size: 1.5rem; transition: 0.3s; }
+        .social-icons a:hover { color: var(--primary); transform: translateY(-3px); }
+
+        /* --- TAPE --- */
+        .tape-container {
+            width: 100%; overflow: hidden; margin-bottom: 6rem;
+            border-top: 1px solid rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: rgba(0,0,0,0.2); white-space: nowrap;
+        }
+        .tape-content { display: inline-block; animation: scroll 30s linear infinite; }
+        .tape-content span {
+            font-size: 1.8rem; font-weight: 800; color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+            text-transform: uppercase; margin-right: 4rem;
+        }
+        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+
+        /* --- ABOUT --- */
+        .about-text { text-align: center; max-width: 800px; margin: 0 auto; }
+        .about-text p { font-size: 1.15rem; line-height: 1.8; color: var(--text-muted); margin-bottom: 2rem; }
+        .highlight { color: white; font-weight: 600; }
+        .stats-row { display: flex; justify-content: center; gap: 4rem; margin-top: 4rem; margin-bottom: 8rem; }
+        .stat-item h3 { font-size: 3rem; color: var(--primary); margin-bottom: 0.5rem; line-height: 1; }
+        .stat-item span { font-size: 0.9rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+
+        /* --- SKILLS --- */
+        .skills-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 1.5rem; }
+        .skill-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            padding: 2rem 0.5rem; border-radius: 12px; text-align: center;
+            position: relative; overflow: hidden; transition: 0.3s;
+        }
+        .skill-card::before {
+            content: ''; position: absolute;
+            background: radial-gradient(300px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.05), transparent 40%);
+            top: 0; left: 0; width: 100%; height: 100%; opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .skill-card:hover::before { opacity: 1; }
+        .skill-card i { font-size: 2rem; margin-bottom: 0.8rem;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy transition */
+            background: linear-transparent; 
+            }
+            /* Hover Animation */
+        .skill-card:hover i {
+            transform: scale(1.2) rotate(5deg); /* Pop up and slight tilt */
+        }
+        .skill-card h3 { font-size: 0.9rem; font-weight: 500; }
+
+        /* Brand Colors */
+        .fa-html5 { color: #E34F26; }
+        .fa-css3-alt { color: #1572B6; }
+        .fa-js { color: #F7DF1E; }
+        .fa-react { color: #61DAFB; }
+        .fa-database { color: #336791; } /* Postgres blue */
+        .fa-python { color: #3776AB; }
+        .fa-figma { color: #F24E1E; }
+        .fa-git-alt { color: #F05032; }
+
+        /* --- PROJECTS: EXPANDING GRID --- */
+        .projects-header {
+            font-size: 3rem; 
+            margin-bottom: 4rem; 
+            text-align: center;
+            background: linear-gradient(to right, #fff, #94a3b8);
+            -webkit-text-fill-color: white;
+            /* Sticky Header Logic */
+            position: sticky; 
+            top: 100px; 
+            z-index: 50;
+            background: transparent;
+            backdrop-filter: blur(15px);
+            padding: 1rem 0;
+            width: 100%;
+            pointer-events: none;
+        }
+
+        .expanding-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .expand-card {
+            /* GRID STATE: 3 Cards Per Row (33.3% - gap) */
+            flex: 1 1 calc(33.333% - 20px); 
+            height: 420px; 
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* EXPANDED STATE: Full Width, Taller */
+        .expand-card.active {
+            flex: 1 1 100%; 
+            height: 500px;
+            border-color: var(--primary);
+            box-shadow: 0 0 30px rgba(56, 189, 248, 0.15);
+        }
+
+        .card-inner {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            /* Default: Vertical Stack (Image Top, Text Bottom) */
+            flex-direction: column;
+        }
+        
+        /* Active: Switch to Horizontal Side-by-Side */
+        .expand-card.active .card-inner {
+            flex-direction: row;
+        }
+
+        /* --- VISUAL (Image Area) --- */
+        .card-visual {
+            width: 100%; height: 50%; /* Default: Top Half */
+            background: #2d3748;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 4rem; color: rgba(255,255,255,0.1);
+            transition: all 0.5s ease;
+            position: relative;
+        }
+        
+        .expand-card.active .card-visual {
+            width: 50%; height: 100%; /* Active: Left Half */
+        }
+
+        .card-visual::after {
+            content: ''; position: absolute; top:0; left:0; width:100%; height:100%;
+            background: linear-gradient(to top, rgba(15,23,42, 0.9), transparent);
+        }
+
+        /* Gradients for visuals */
+        .v1 { background: linear-gradient(45deg, #1e1b4b, #312e81); }
+        .v2 { background: linear-gradient(45deg, #022c22, #115e59); }
+        .v3 { background: linear-gradient(45deg, #4a044e, #86198f); }
+        .v4 { background: linear-gradient(45deg, #7c2d12, #ea580c); }
+        .v5 { background: linear-gradient(45deg, #0f172a, #334155); }
+        .v6 { background: linear-gradient(45deg, #4c0519, #9f1239); }
+
+        /* --- DETAILS (Text Area) --- */
+        .card-details {
+            width: 100%; height: 50%; /* Default: Bottom Half */
+            background: var(--bg-card);
+            padding: 1.5rem;
+            display: flex; flex-direction: column; justify-content: center;
+            transition: all 0.5s ease;
+        }
+
+        .expand-card.active .card-details {
+            width: 50%; height: 100%; /* Active: Right Half */
+            padding: 3rem;
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        .card-details h3 { font-size: 1.5rem; margin-bottom: 0.5rem; color: white; transition: 0.3s; }
+        .expand-card.active .card-details h3 { font-size: 2.5rem; margin-bottom: 1rem; }
+
+        .card-details p { 
+            font-size: 0.9rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1rem; 
+            /* Truncate text when collapsed to keep it neat */
+            display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        
+        .expand-card.active .card-details p { 
+            font-size: 1.1rem; margin-bottom: 2rem; 
+            -webkit-line-clamp: unset; /* Show full text when active */
+        }
+
+        .tech-row { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+        .tech-tag { padding: 0.3rem 0.8rem; border: 1px solid var(--border); border-radius: 50px; color: var(--primary); font-size: 0.8rem; }
+        
+        .action-row { 
+            margin-top: auto;
+        }
+        .expand-card.active .action-row { display: flex; } /* Buttons show when active */
+
+        .action-row a {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            margin-right: 1.5rem; color: white; text-decoration: none; font-weight: 600;
+            padding-bottom: 2px; border-bottom: 1px solid var(--primary);
+        }
+
+        /* --- CONTACT --- */
+        .contact-wrapper { max-width: 500px; margin: 0 auto; }
+        .form-box { background: transparent; padding: 0; border: none; }
+        .input-group { margin-bottom: 2rem; border-bottom: 1px solid var(--border); }
+        .input-group input, .input-group textarea {
+            width: 100%; padding: 1rem 0; background: transparent; border: none;
+            color: white; font-size: 1.1rem; outline: none; transition: 0.3s;
+        }
+        .input-group label { font-size: 0.8rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+        .input-group:focus-within { border-color: var(--primary); }
+
+        /* --- FOOTER --- */
+        footer { padding: 4rem 0; text-align: center; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 0.9rem; }
+        .footer-socials { display: flex; justify-content: center; gap: 2rem; margin-bottom: 2rem; }
+        .footer-socials a { color: white; font-size: 1.2rem; transition: 0.3s; }
+        .footer-socials a:hover { color: var(--primary); transform: translateY(-3px); }
+
+        /* --- SCROLL REVEAL ANIMATION --- */
+        .reveal { 
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1s ease; }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @media (max-width: 500px) {
+            .hero-grid { grid-template-columns: 1fr; text-align: center; gap: 2rem; }
+            .avatar-container { margin-top: 0; order: -1; }
+            .hero-left { order: 2; }
+            .hamburger { display: block; }
+            .nav-links {
+                position: fixed; top: 0; right: -100%; width: 70%; height: 100vh;
+                background: rgba(15, 23, 42, 0.98); flex-direction: column;
+                justify-content: center; align-items: center; transition: 0.3s ease-in-out;
+            }
+            .nav-links.active { right: 0; }        
+            
+            /* Mobile Grid Fallback */
+            .expand-card { flex: 1 1 100%; height: auto; }
+            .expand-card.active { flex-direction: column; height: auto; }
+            .card-inner, .expand-card.active .card-inner { flex-direction: column; }
+            .card-visual, .expand-card.active .card-visual { width: 100%; height: 200px; }
+            .card-details, .expand-card.active .card-details { width: 100%; height: auto; padding: 1.5rem; }
+            .action-row { display: flex; margin-top: 1rem; }
+            
+        }
+        @media (max-width: 1100px) {
+            /* PROJECTS: SWITCH TO 2 COLUMNS HERE */
+            .expand-card { flex: 1 1 calc(50% - 20px); }
+            
+        }
+        @media (max-width: 650px) {
+
+        .stats-row {
+                flex-direction: column; /* Stack them vertically on mobile */
+                gap: 3rem;              /* Reduce the gap between items */
+                margin-top: 3rem;
+                margin-bottom: 4rem;    /* Reduce bottom space on mobile */
+            }
+            
+            .stat-item h3 {
+                font-size: 2.5rem;      /* Slightly smaller text on mobile */
+            }
+        }
+    </style>
+</head>
+<body class="hover-target">
+
+    <div id="intro-overlay" class="fixed inset-0 z-[9999] flex pointer-events-none">
+        <div class="intro-col w-1/5 h-full bg-black transition-transform duration-700 ease-in-out"></div>
+        <div class="intro-col w-1/5 h-full bg-black transition-transform duration-700 ease-in-out delay-[100ms]"></div>
+        <div class="intro-col w-1/5 h-full bg-black transition-transform duration-700 ease-in-out delay-[200ms] flex items-center justify-center"></div>
+        <div class="intro-col w-1/5 h-full bg-black transition-transform duration-700 ease-in-out delay-[300ms]"></div>
+        <div class="intro-col w-1/5 h-full bg-black transition-transform duration-700 ease-in-out delay-[400ms]"></div>
+        <div id="intro-text-container">
+            <span id="intro-text" class="text-white font-bold text-4xl transition-opacity duration-300">HELLO.</span>
+        </div>
+      </div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
+
+    <nav>
+        <div class="container nav-content">
+            <a href="#" class="logo hover-target">Christi</a>
+            <div class="nav-links">
+                <a href="#about" class="hover-target">About</a>
+                <a href="#skills" class="hover-target">Skills</a>
+                <a href="#work" class="hover-target">Work</a>
+                <a href="#contact" class="hover-target">Contact</a>
+            </div>
+            <div class="hamburger hover-target"><i class="fas fa-bars"></i></div>
+        </div>
+    </nav>
+
+    <section id="home" class="hero container">
+        <div class="hero-grid">
+            <div class="hero-left">
+                <p style="color: var(--primary); letter-spacing: 2px; font-size: 0.9rem; margin-bottom: 1rem;">HELLO, I'M</p>
+                <h1>Christina <span style="color: white;">DSilva</span><br><span>Web Creator</span></h1>
+                <div class="typewriter" id="typewriter"></div>
+                <p class="hero-text">Merging creativity with code to build immersive, pixel-perfect digital experiences. Let's turn your ideas into reality.</p>
+                <a href="#contact" class="btn hover-target">Let's Talk</a>
+                <div class="social-icons">
+                    <a href="https://github.com/Miss-Christi" target="_blank" class="hover-target"><i class="fab fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/christina-dsilva" target="_blank" class="hover-target"><i class="fab fa-linkedin"></i></a>
+                    <a href="resume.pdf" target="_blank" class="hover-target" title="View Resume"><i class="fas fa-file-pdf"></i></a>
+                </div>
+            </div>
+            <div class="hero-right reveal">
+                <div class="avatar-container hover-target">
+                    <div class="avatar-box"></div>
+                    <img class="avatar-img" src="Christina_3D_bg.png" alt="Christina 3D Avatar" style="border-radius: 20px; filter: drop-shadow(0 10px 10px rgba(0,20,0,1)) drop-shadow(0 0 50px rgba(139, 92, 246, 0.8))">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div class="tape-container">
+        <div class="tape-content">
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CREATIVE DEV &bull; UI/UX DESIGN &bull; BUILDING THE FUTURE &bull; VISUAL STORYTELLING &bull; PIXEL PERFECT &bull; SOLVING PROBLEMS &bull; MODERN AESTHETICS &bull; INTERACTIVE EXPERIENCES &bull; FRONTEND & BACKEND &bull;</span>
+            <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; CREATIVE DEV &bull; UI/UX DESIGN &bull; BUILDING THE FUTURE &bull; VISUAL STORYTELLING &bull; PIXEL PERFECT &bull; SOLVING PROBLEMS &bull; MODERN AESTHETICS &bull; INTERACTIVE EXPERIENCES &bull; FRONTEND & BACKEND &bull;</span>
+        </div>
+    </div>
+
+    <section id="about" class="container">
+        <h2 class="reveal">About Me</h2>
+        <div class="about-text reveal">
+            <p>I don't just write code; I craft digital experiences. Blending <span class="highlight">artistic direction</span> with technical precision, I build websites that are as beautiful as they are functional.</p>
+            <p>I believe the web should feel like <span class="highlight">magic</span>—fluid, immersive, and unforgettable.</p>
+            <div class="stats-row">
+                <div class="stat-item hover-target"><h3>50+</h3><span>Design Revisions</span></div>
+                <div class="stat-item hover-target"><h3>404</h3><span>Bugs Squashed</span></div>
+                <div class="stat-item hover-target"><h3>24/7</h3><span>Creative Mode On</span></div>
+                <div class="stat-item hover-target"><h3>100%</h3><span>Commitment</span></div>
+            </div>
+        </div>
+    </section>
+
+    <section id="skills" class="container">
+        <h2 class="reveal">Tech Stack</h2>
+        <div class="skills-grid reveal" id="skills-container">
+            <div class="skill-card hover-target">
+                <i class="devicon-html5-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #3776AB;"></i>
+                <h3>HTML</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-css3-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #009688; "></i>
+                <h3>CSS</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-javascript-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #336791;"></i>
+                <h3>Javascript</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-react-original" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #61DAFB;"></i>
+                <h3>React</h3>
+            </div>
+
+            <div class="skill-card hover-target">
+                <i class="devicon-figma-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #2496ED; "></i>
+                <h3>Figma</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-nodejs-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #3178C6; "></i>
+                <h3>Node.js</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-python-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #06B6D4;"></i>
+                <h3>Python</h3>
+            </div>
+            
+            <div class="skill-card hover-target">
+                <i class="devicon-mysql-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #F05032;"></i>
+                <h3>MySQL</h3>
+            </div>
+            <div class="skill-card hover-target">
+                <i class="devicon-git-plain" style="font-size: 3rem; margin-bottom: 0.8rem; display:block; color: #F05032;"></i>
+                <h3>Git</h3>
+            </div>
+        </div>
+    </section>
+
+    <section id="work" class="container">
+        <h2 class="reveal projects-header">Featured Works</h2>
+        
+        <div class="expanding-grid">
+            
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v1"><img src="Red Is Routine.png" alt="Runner Game" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                    <div class="card-details">
+                        <h3>Runner Game</h3>
+                        <p>A mobile-friendly 2D runner game featuring custom animations, smooth canvas rendering, and optimized collision/scoring systems.</p>
+                        <div class="tech-row"><span class="tech-tag">Javascript</span><span class="tech-tag">Canvas API</span><span class="tech-tag">HTML5</span></div>
+                        <div class="action-row">
+                            <a href="https://redisroutinegame.vercel.app">Live Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://github.com/Miss-Christi/red_is_routine_game">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v2"><img src="VitalCare Hospital.png" alt="VitalCare Hospital" style="width: 100%; height: 100%; object-fit: cover;"></div>
+                    <div class="card-details">
+                        <h3>Cancer Hospital Platform</h3>
+                        <p>A responsive, multi-section webpage featuring interactive info cards, location-based hospital listings, and a touching patient stories carousel.</p>
+                        <div class="tech-row"><span class="tech-tag">JavaScript</span><span class="tech-tag">Responsive UI</span></div>
+                        <div class="action-row">
+                            <a href="vitalcare-hospital.vercel.app">Live Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="https://github.com/Miss-Christi/VitalCare_Hospital">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v3"><i class="fas fa-robot"></i></div>
+                    <div class="card-details">
+                        <h3>Book Nook Café</h3>
+                        <p>A full-stack responsive café website featuring dynamic menu displays, event details, gallery, and Google Maps integration.</p>
+                        <div class="tech-row"><span class="tech-tag">React</span><span class="tech-tag">Node.js</span><span class="tech-tag">Express</span></div>
+                        <div class="action-row">
+                            <a href="#">Live Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="#">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!--
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v4"><i class="fas fa-wallet"></i></div>
+                    <div class="card-details">
+                        <h3>Crypto Tracker</h3>
+                        <p>Real-time cryptocurrency tracking dashboard utilizing CoinGecko API for live price updates and historical charts.</p>
+                        <div class="tech-row"><span class="tech-tag">Next.js</span><span class="tech-tag">D3.js</span></div>
+                        <div class="action-row">
+                            <a href="#">Live Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="#">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v5"><i class="fas fa-comments"></i></div>
+                    <div class="card-details">
+                        <h3>Social Connect</h3>
+                        <p>A high-performance social networking app featuring live chat via WebSockets, media sharing, and secure user authentication.</p>
+                        <div class="tech-row"><span class="tech-tag">Vue.js</span><span class="tech-tag">Socket.io</span></div>
+                        <div class="action-row">
+                            <a href="#">Live Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="#">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <article class="expand-card hover-target" onclick="toggleCard(this)">
+                <div class="card-inner">
+                    <div class="card-visual v6"><i class="fas fa-gamepad"></i></div>
+                    <div class="card-details">
+                        <h3>E-Commerce</h3>
+                        <p>A comprehensive dashboard for managing orders, analytics, and inventory with real-time data visualization and Stripe integration.</p>
+                        <div class="tech-row"><span class="tech-tag">Phaser.js</span><span class="tech-tag">JavaScript</span></div>
+                        <div class="action-row">
+                            <a href="#">Play Demo <i class="fas fa-arrow-right"></i></a>
+                            <a href="#">View Code <i class="fab fa-github"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </article>-->
+
+        </div>
+    </section>
+
+    <section id="contact" class="container">
+        <h2 class="reveal" style= "margin-bottom: 4rem">Get In Touch</h2>
+        <div class="contact-wrapper reveal">
+            <form action="https://api.web3forms.com/submit" method="POST" class="form-box" id="contact-form">
+                <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+            
+                <div class="input-group">
+                    <label>What's your name?</label>
+                    <input type="text" name="name" class="hover-target" placeholder="John Doe" required>
+                </div>
+                <div class="input-group">
+                    <label>What's your email?</label>
+                    <input type="email" name="email" class="hover-target" placeholder="john@example.com" required>
+                </div>
+                <div class="input-group">
+                    <label>Tell me about it</label>
+                    <textarea name="message" rows="4" class="hover-target" placeholder="I have an idea for..." required></textarea>
+                </div>
+                
+                <button type="submit" class="btn hover-target" style="width: 100%; border:none;">
+                    <span id="btn-text">Send Message</span>
+                </button>
+                
+                <p id="result" style="color: #38bdf8; text-align: center; margin-top: 1rem; display: none;"></p>
+            
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-socials">
+                <a href="https://github.com/Miss-Christi" target="_blank" class="hover-target"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/christina-dsilva" target="_blank" class="hover-target"><i class="fab fa-linkedin"></i></a>
+                <a href="resume.pdf" target="_blank" class="hover-target"><i class="fas fa-file-pdf"></i></a>
+            </div>
+            <p>&copy; 2025 Christi D. Crafted with code and creativity.</p>
+        </div>
+    </footer>
+
+    <script>
+        
+        window.addEventListener('load', () => {
+          // Wait 2 seconds, then slide up
+          setTimeout(() => {
+            // Move columns up
+            document.querySelectorAll('.intro-col').forEach(el => {
+              el.style.transform = 'translateY(-100%)';
+            });
+            // Fade out text
+            const text = document.getElementById('intro-text');
+            if(text) text.style.opacity = '0';
+          }, 700);
+        });
+        // --- EXPANDING GRID LOGIC ---
+        function toggleCard(card) {
+            const allCards = document.querySelectorAll('.expand-card');
+            if (card.classList.contains('active')) {
+                card.classList.remove('active');
+            } else {
+                allCards.forEach(c => c.classList.remove('active'));
+                card.classList.add('active');
+            }
+        }
+
+        // --- TYPEWRITER ---
+        const textElement = document.getElementById('typewriter');
+        const phrases = ['Front-End Developer', 'UI/UX Designer', 'Creative Coder', 'Full Stack Engineer'];
+        let phraseIndex = 0, charIndex = 0, isDeleting = false;
+        function type() {
+            const currentPhrase = phrases[phraseIndex];
+            if (isDeleting) { textElement.textContent = currentPhrase.substring(0, charIndex - 1); charIndex--; } 
+            else { textElement.textContent = currentPhrase.substring(0, charIndex + 1); charIndex++; }
+            if (!isDeleting && charIndex === currentPhrase.length) { isDeleting = true; setTimeout(type, 2000); } 
+            else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; setTimeout(type, 500); } 
+            else { setTimeout(type, isDeleting ? 100 : 200); }
+        }
+        type();
+
+        // --- CURSOR ---
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        const targets = document.querySelectorAll('.hover-target, a, button, input, textarea');
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX; const posY = e.clientY;
+            cursorDot.style.left = `${posX}px`; cursorDot.style.top = `${posY}px`;
+            cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
+        });
+        targets.forEach(target => {
+            target.addEventListener('mouseenter', () => document.body.classList.add('hovering'));
+            target.addEventListener('mouseleave', () => document.body.classList.remove('hovering'));
+        });
+
+        // --- HAMBURGER ---
+        const hamburger = document.querySelector('.hamburger');
+        const navLinks = document.querySelector('.nav-links');
+        hamburger.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+            hamburger.innerHTML = navLinks.classList.contains('active') ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+
+        // --- SKILLS SPOTLIGHT ---
+        const container = document.getElementById('skills-container');
+        const cards = document.querySelectorAll('.skill-card');
+        container.onmousemove = e => {
+            for(const card of cards) {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left; const y = e.clientY - rect.top;
+                card.style.setProperty("--mouse-x", `${x}px`); card.style.setProperty("--mouse-y", `${y}px`);
+            }
+        };
+
+        // --- SCROLL REVEAL ---
+        const revealElements = document.querySelectorAll('.reveal');
+        const checkScroll = () => {
+            const trigger = window.innerHeight * 0.85;
+            revealElements.forEach(el => {
+                const top = el.getBoundingClientRect().top;
+                if(top < trigger) el.classList.add('active');
+            });
+        };
+        window.addEventListener('scroll', checkScroll);
+        checkScroll();
+
+            // --- FORM PROCESSING ---    
+        const form = document.getElementById('contact-form');
+        const result = document.getElementById('result');
+        const btnText = document.getElementById('btn-text');
+
+        form.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(form);
+        const object = Object.fromEntries(formData);
+        const json = JSON.stringify(object);
+
+        btnText.innerHTML = "Sending...";
+
+        fetch('https://api.web3forms.com/submit', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: json
+        })
+        .then(async (response) => {
+            let json = await response.json();
+            if (response.status == 200) {
+                result.style.display = "block";
+                result.innerHTML = "Message sent successfully!";
+                btnText.innerHTML = "Send Message";
+                form.reset();
+                setTimeout(() => {
+                    result.style.display = "none";
+                }, 5000);
+            } else {
+                console.log(response);
+                result.innerHTML = json.message;
+            }
+        })
+        .catch(error => {
+            console.log(error);
+            result.innerHTML = "Something went wrong!";
+        });
+        });
+    </script>
+</body>
+</html>
